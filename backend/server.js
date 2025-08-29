@@ -1,7 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+
 require('dotenv').config();
+
+// Debug log for MONGO_URI
+console.log('MONGO_URI:', process.env.MONGO_URI);
 
 const uploadRouter = require('./routes/upload');
 
@@ -16,6 +20,7 @@ app.use(cors({
 app.use(express.json());
 
 // MongoDB connection
+console.log('MONGO_URI:', process.env.MONGO_URI);
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
