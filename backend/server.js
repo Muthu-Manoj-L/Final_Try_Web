@@ -14,13 +14,31 @@ const PORT = process.env.PORT || 5000;
 
 // Middlewares
 app.use(cors({
-  origin: ['https://spectraldataanalysis.netlify.app'],
+  origin: (origin, callback) => {
+    if (
+      origin === 'https://spectraldataanalysis.netlify.app' ||
+      (origin && origin.endsWith('.netlify.app'))
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
 // Handle preflight requests for all routes
 app.options('*', cors({
-  origin: ['https://spectraldataanalysis.netlify.app'],
+  origin: (origin, callback) => {
+    if (
+      origin === 'https://spectraldataanalysis.netlify.app' ||
+      (origin && origin.endsWith('.netlify.app'))
+    ) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
