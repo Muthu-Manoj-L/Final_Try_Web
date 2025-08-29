@@ -17,6 +17,12 @@ app.use(cors({
   origin: ['https://spectraldataanalysis.netlify.app'],
   credentials: true
 }));
+
+// Handle preflight requests for all routes
+app.options('*', cors({
+  origin: ['https://spectraldataanalysis.netlify.app'],
+  credentials: true
+}));
 app.use(express.json());
 
 // MongoDB connection
