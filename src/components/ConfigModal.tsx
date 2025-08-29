@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { X, Upload, Save, Settings } from 'lucide-react';
 import { Widget, Theme } from '../types';
 
@@ -12,6 +12,8 @@ interface ConfigModalProps {
 
 const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, widget, onClose, onUpdate, theme }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   if (!isOpen || !widget) return null;
 
@@ -19,11 +21,16 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, widget, onClose, onUp
     const file = event.target.files?.[0];
     if (!file) return;
 
+    setUploading(true);
+    setUploadError(null);
     const formData = new FormData();
     formData.append('file', file);
 
     try {
-      const response = await fetch('/api/upload', {
+      // Use VITE_API_URL if available
+      const apiUrl = import.meta.env.VITE_API_URL || '';
+      const uploadUrl = apiUrl ? `${apiUrl}/upload` : '/api/upload';
+      const response = await fetch(uploadUrl, {
         method: 'POST',
         body: formData,
       });
@@ -39,9 +46,12 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, widget, onClose, onUp
           parsedData: result.parsedData,
         },
       });
-    } catch (error) {
+    } catch (error: any) {
+      setUploadError(error?.message || 'File upload failed');
       alert('File upload failed');
       console.error(error);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -79,7 +89,13 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ isOpen, widget, onClose, onUp
                   ? widget.data.filename
                   : 'Click to upload CSV/XLS file'}
               </p>
-              {widget.data && widget.data.filename && (
+              {uploading && (
+                <p className="text-sm mt-1 text-blue-500">Uploading...</p>
+              )}
+              {uploadError && (
+                <p className="text-sm mt-1 text-red-500">{uploadError}</p>
+              )}
+              {widget.data && widget.data.filename && !uploading && !uploadError && (
                 <p
                   className={`text-sm mt-1 ${
                     theme === 'dark' ? 'text-green-400' : 'text-green-600'
