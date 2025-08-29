@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const { parse } = require('csv-parse/sync');
 const ExcelJS = require('exceljs');
-const File = require('../models/file');
+const File = require('../models/File');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
